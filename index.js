@@ -4,6 +4,6 @@
 
 import {AppRegistry} from 'react-native';
 import {name as appName} from './app.json';
-import { Rusia2018App } from './src/Rusia2018App';
+import { UsatApp } from './src/UsatApp';
 
-AppRegistry.registerComponent(appName, () => Rusia2018App);
+AppRegistry.registerComponent(appName, () => UsatApp);

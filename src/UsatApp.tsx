@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient()
 
-export const Rusia2018App = () => {
+export const UsatApp = () => {
 
   const colorScheme = useColorScheme();
 
