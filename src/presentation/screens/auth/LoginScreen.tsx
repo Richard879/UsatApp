@@ -6,13 +6,16 @@ import { MyIcon } from '../../components/ui/MyIcon'
 import { StackScreenProps } from '@react-navigation/stack'
 import { RootStackParams } from '../../navigation/Navigation'
 import { API_URL, STAGE } from '@env'
-import { useAuthStore } from '../../store/auth/usAuthStore'
+import { authSlice } from '../../store/authSlice'
+import { AuthRepositoryImpl } from '../../../infrastructure/repositories/AuthRepositoryImpl'
+import { LoginUser } from '../../../core/usecases/LoginUser'
+import { TokenServiceImpl } from '../../../infrastructure/services/TokenServiceImpl'
 
 interface Props extends StackScreenProps<RootStackParams, 'LoginScreen'>{}
 
 export const LoginScreen = ( { navigation }: Props) => {
 
-  const { login } = useAuthStore();
+  const { loginSuccess, loginFailure } = authSlice();
   const [isPosting , setIsPosting] = useState(false);
   const [form, setForm] = useState({
     userName: '',
@@ -20,22 +23,47 @@ export const LoginScreen = ( { navigation }: Props) => {
   });
   const { height } = useWindowDimensions();
 
-   console.log({ apiUrl: API_URL, stage: STAGE });
+  console.log({ apiUrl: API_URL, stage: STAGE });
 
   const onLogin = async() => {
-    if( form.userName.length === 0 || form.password.length === 0){
-      return;
-    }
+
+    try {
+      if( form.userName.length === 0 || form.password.length === 0){
+        return;
+      }
   
-    setIsPosting(true);
+      setIsPosting(true);
 
-    const wasSuccessful = await login(form.userName, form.password);
-    setIsPosting(false);
-    // console.log(wasSuccessful);
-    if(wasSuccessful) return;
-    Alert.alert('Error', 'Usuario o contraseña incorrectos');
+      //const wasSuccessful = await login(form.userName, form.password);
+
+      const authRepository = new AuthRepositoryImpl();
+      const loginUseCase = new LoginUser(authRepository);
+      const auth = await loginUseCase.execute(form.userName, form.password);
+      
+      setIsPosting(false);
+
+      if (!auth) {
+        Alert.alert('Error', 'Usuario o contraseña incorrectos');
+        return;
+      }
+
+     // Guardar token (aquí podrías inyectar el TokenService)
+      const tokenService = new TokenServiceImpl();
+      await tokenService.saveToken(auth.token);
+      if (auth.refreshToken) {
+        await tokenService.saveRefreshToken(auth.refreshToken);
+      }
+      
+      loginSuccess(auth);
+
+      navigation.navigate("HomeScreen");
+    
+    } catch (error) {
+      loginFailure('Usuario o contraseña incorrectos');
+      setIsPosting(false);
+      console.error('Error during login:', error);
+    }
   }
-
 
   return (
     <Layout style={{flex: 1}}>

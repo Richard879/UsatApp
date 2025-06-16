@@ -34,9 +34,9 @@ export const UsatApp = () => {
             notification: theme['color-primary-500']
           }
         }}>
-          <AuthProvider>
+       
             <Navigation />
-          </AuthProvider>
+        
         </NavigationContainer>
       </ApplicationProvider>
     </QueryClientProvider>
