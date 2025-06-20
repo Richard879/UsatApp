@@ -8,6 +8,7 @@ import { useColorScheme } from 'react-native';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { AuthProvider } from './presentation/providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SideMenuNavigator } from './presentation/navigation/SideMenuNavigator';
 
 const queryClient = new QueryClient()
 
@@ -35,7 +36,7 @@ export const UsatApp = () => {
           }
         }}>
        
-            <Navigation />
+            <SideMenuNavigator />
         
         </NavigationContainer>
       </ApplicationProvider>
